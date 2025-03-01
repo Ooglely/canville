@@ -1,6 +1,15 @@
-import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, varchar } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
-	id: serial('id').primaryKey(),
-	age: integer('age'),
+export const city = pgTable('city', {
+    cityid: serial('cityid').primaryKey(),
+    citymoney: integer('citymoney').notNull()
+});
+
+export const building = pgTable('building', {
+    buildingid: serial('buildingid').primaryKey(),
+    cityid: integer('cityid').notNull().references(() => city.cityid, { onDelete: 'cascade' }),
+    sprite: varchar({ length: 255 }).notNull(),
+    size: varchar({ length: 255 }).notNull(),
+    x: integer('x').notNull(),
+    y: integer('y').notNull()
 });
