@@ -9,6 +9,7 @@ const city = await addCity(5000);
 const buildingtest = await addBuilding(city.cityid, "chungushouse.png", "large", 0, 0);
 const buildingtest2 = await addBuilding(city.cityid, "chungus.png", "chungus", 2, 2);
 const buildingtest3 = await addBuilding(city.cityid, "bigchungus.png", "bigchungus", 4, 4);
+const buildingtest4 = await addBuilding(city.cityid, "bigchungus.png", "bigchungus", 4, 4);
 
 //get cities/buildings test (all cities, all buildings for specified city)
 const cities = await getAllCities();
