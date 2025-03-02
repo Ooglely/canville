@@ -2,8 +2,8 @@ import { eq } from "drizzle-orm";
 import { cityTable, buildingTable } from "./schema";
 import { db } from "./index";
 
-export async function addCity(cityMoney: number) {
-  const newCity = await db.insert(cityTable).values({ citymoney: cityMoney }).returning();
+export async function addCity(ownerId: string, cityMoney: number) {
+  const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney }).returning();
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
   return newCity[0];
 }
