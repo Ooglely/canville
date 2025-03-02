@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { CanvasApi } from "$lib/canvas/api";
+import { fail } from "@sveltejs/kit";
 import { addUser, getUserFromSession, getUserFromToken, getAllUsers } from "$lib/server/db/user";
 
 export const load: PageServerLoad = async ({ cookies }) => {
@@ -25,16 +26,13 @@ export const actions: Actions = {
     const data = await request.formData();
     const token = data.get("token") as string;
     if (!token) {
-      return {
-        status: 400,
-        error: "No token provided",
-      };
+      return fail(400, { failure: true, error: "No token provided" });
     }
 
     // See if token already exists in the database
     const user = await getUserFromToken(token);
     if (user) {
-      cookies.set("session", user.id, { path: "/" });
+      cookies.set("session", user.id, { path: "/", secure: false });
       return {
         status: 200,
         user,
@@ -42,20 +40,16 @@ export const actions: Actions = {
     }
 
     // Token doesn't exist, create a new user in the db
-    try {
-      var api = new CanvasApi(token);
-      const user = await addUser(token);
-      cookies.set("session", user.id, { path: "/" });
-      return {
-        status: 200,
-        user,
-      };
-    } catch (error) {
-      console.error(error);
-      return {
-        status: 500,
-        error: "Failed to authenticate with Canvas API, invalid token?",
-      };
+    var api = new CanvasApi(token);
+    if (!(await api.isValid())) {
+      return fail(400, { failure: true, error: "Failed to authenticate with Canvas API, invalid token?" });
     }
+    console.log("valid");
+    const new_user = await addUser(token);
+    cookies.set("session", new_user.id, { path: "/", secure: false, httpOnly: false });
+    return {
+      status: 200,
+      user,
+    };
   },
 };

@@ -7,8 +7,29 @@
 
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
+    console.log(data);
 
-    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] }[]>([]);
+    let towns = $state<
+        {
+            name: string;
+            x: number;
+            y: number;
+            squares: {
+                name: string;
+                x: number;
+                y: number;
+                border: boolean;
+                backgroundImage: string;
+                rotateDeg: number;
+                gridCoords: [number, number];
+                image: string;
+                width: number;
+                height: number;
+                top: number;
+                left: number;
+            }[];
+        }[]
+    >([]);
     let towncount = 0;
     let direction = 0; // 0=start, 1 = up, 2 = left, 3 = down, 4 = right
     let directioncount = 0;
@@ -58,27 +79,40 @@
             }
         }
 
-        const squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] = [];
+        const squares: {
+            name: string;
+            x: number;
+            y: number;
+            border: boolean;
+            backgroundImage: string;
+            rotateDeg: number;
+            gridCoords: [number, number];
+            image: string;
+            width: number;
+            height: number;
+            top: number;
+            left: number;
+        }[] = [];
         const gridSize = 9;
         const spacing = 64;
 
         for (let i = 0; i < gridSize; i++) {
             for (let j = 0; j < gridSize; j++) {
-            const isBorder = i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1;
-            squares.push({
-                name: isBorder ? `Border ${i * gridSize + j + 1}` : `Test ${i * gridSize + j + 1}`,
-                x: currentX + j * spacing,
-                y: currentY + i * spacing,
-                gridCoords: [i, j],
-                border: isBorder,
-                backgroundImage: "/grass.png",
-                rotateDeg: 0,
-                image: "",
-                width: 64,
-                height: 64,
-                top: 0,
-                left: 0,
-            });
+                const isBorder = i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1;
+                squares.push({
+                    name: isBorder ? `Border ${i * gridSize + j + 1}` : `Test ${i * gridSize + j + 1}`,
+                    x: currentX + j * spacing,
+                    y: currentY + i * spacing,
+                    gridCoords: [i, j],
+                    border: isBorder,
+                    backgroundImage: "/grass.png",
+                    rotateDeg: 0,
+                    image: "",
+                    width: 64,
+                    height: 64,
+                    top: 0,
+                    left: 0,
+                });
             }
         }
 
@@ -151,7 +185,7 @@
     </span>
     <hr />
     {#if logged_in}
-        <p>hello {data.user?.data.name.split(" ")[0]}!</p>
+        <p>Hello {data.user?.data.name.split(" ")[0]}!</p>
     {:else}
         <p>
             you seem to be lost...<br />
@@ -165,7 +199,7 @@
             use:enhance={() => {
                 log_loading = true;
 
-                return async ({ update }) => {
+                return async ({ result, update }) => {
                     log_loading = false;
                     update();
                 };
@@ -175,6 +209,9 @@
         </form>
         {#if log_loading}
             <p>loading...</p>
+        {/if}
+        {#if form?.failure}
+            <p>{form.error}</p>
         {/if}
     {/if}
 </div>
@@ -285,5 +322,4 @@
         background-size: auto;
         background-repeat: repeat;
     }
-
 </style>

@@ -43,27 +43,28 @@ export type UserData = {
 };
 
 export class CanvasApi {
-  private access_token: string;
+  private access_token: string | null = null;
 
   constructor(access_token: string) {
     //
     this.access_token = access_token;
-    if (!this.access_token) {
-      throw new Error("Access token is required");
-    }
-    try {
-      this.getUserInfo();
-    } catch (error) {
-      throw new Error("Access token is invalid");
-    }
   }
 
-  async getUserInfo(): Promise<UserInfo> {
-    const response = await axios.get("https://umsystem.instructure.com/api/v1/users/self", {
-      headers: {
-        Authorization: `Bearer ${this.access_token}`,
-      },
-    });
+  async isValid(): Promise<boolean> {
+    return (await this.getUserInfo()) != null;
+  }
+
+  async getUserInfo(): Promise<UserInfo | null> {
+    const response = await axios
+      .get("https://umsystem.instructure.com/api/v1/users/self", {
+        headers: {
+          Authorization: `Bearer ${this.access_token}`,
+        },
+      })
+      .catch(() => {
+        return null;
+      });
+    if (!response) return null;
     if (response.status === 200) {
       const data = response.data;
       return {
