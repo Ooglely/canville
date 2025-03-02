@@ -1,13 +1,16 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
     import type { StoredBuilding } from "$lib/server/db/city";
-    import { enhance } from "$app/forms";
+    import { enhance, applyAction } from "$app/forms";
     import Town from "./Town.svelte";
+    import { onMount } from "svelte";
 
     let { data, form }: PageProps = $props();
 
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
+    let window_width = $state(0);
+    let window_height = $state(0);
     console.log(data);
 
     let towns = $state<
@@ -219,6 +222,14 @@
         }
     }
 
+    function addManualTown(name: string) {
+        createTown(name, []);
+    }
+
+    function getAllOwnerIds() {
+        return data.all_cities.map((town) => town.ownerId);
+    }
+
     setTimeout(() => {
         towns = [...towns];
         console.log("Forced update, towns count:", towns.length);
@@ -255,8 +266,14 @@
             dragY = event.clientY - initY;
         }
     }
+
+    function handleWindowLoad(event: Event) {
+        moveX = window_width / 2 - 288;
+        moveY = window_height / 2 - 288;
+    }
 </script>
 
+<svelte:window onload={handleWindowLoad} bind:innerWidth={window_width} bind:innerHeight={window_height} />
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
@@ -266,7 +283,7 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
+        <img class="logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <hr />
@@ -287,6 +304,14 @@
 
                 return async ({ result, update }) => {
                     log_loading = false;
+                    if (result.type == "success") {
+                        await applyAction(result);
+                        if (form?.user) {
+                            if (!getAllOwnerIds().includes(form.user.id)) {
+                                addManualTown(form.user.data.name.split(" ")[0]);
+                            }
+                        }
+                    }
                     update();
                 };
             }}
@@ -303,7 +328,7 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
+        <img class="logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <br />
