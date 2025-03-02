@@ -8,7 +8,7 @@
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
 
-    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] }[]>([]);
+    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[], neighbors: { top: boolean, left: boolean, bottom: boolean, right: boolean, topLeft: boolean, topRight: boolean, bottomLeft: boolean, bottomRight: boolean } }[]>([]);
     let towncount = 0;
     let direction = 0; // 0=start, 1 = up, 2 = left, 3 = down, 4 = right
     let directioncount = 0;
@@ -16,6 +16,58 @@
     let currentX = 0;
     let currentY = 0;
     let townSpacing = 64 * 8;
+
+    function checkNeighbors(town: { name: string; x: number; y: number; squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] }) {
+        const neighbors = {
+            top: false,
+            left: false,
+            bottom: false,
+            right: false,
+            topLeft: false,
+            topRight: false,
+            bottomLeft: false,
+            bottomRight: false
+        };
+
+        for (const otherTown of towns) {
+            if (otherTown === town) continue;
+
+            if (otherTown.x === town.x && otherTown.y === town.y - townSpacing) {
+                neighbors.top = true;
+            }
+            if (otherTown.x === town.x - townSpacing && otherTown.y === town.y) {
+                neighbors.left = true;
+            }
+            if (otherTown.x === town.x && otherTown.y === town.y + townSpacing) {
+                neighbors.bottom = true;
+            }
+            if (otherTown.x === town.x + townSpacing && otherTown.y === town.y) {
+                neighbors.right = true;
+            }
+            if (otherTown.x === town.x - townSpacing && otherTown.y === town.y - townSpacing) {
+                neighbors.topLeft = true;
+            }
+            if (otherTown.x === town.x + townSpacing && otherTown.y === town.y - townSpacing) {
+                neighbors.topRight = true;
+            }
+            if (otherTown.x === town.x - townSpacing && otherTown.y === town.y + townSpacing) {
+                neighbors.bottomLeft = true;
+            }
+            if (otherTown.x === town.x + townSpacing && otherTown.y === town.y + townSpacing) {
+                neighbors.bottomRight = true;
+            }
+        }
+
+        return neighbors;
+    }
+
+
+    function updateAllNeighbors() {
+        for (const town of towns) {
+            town.neighbors = checkNeighbors(town);
+            console.log(`Town: ${town.name}, Neighbors: ${JSON.stringify(town.neighbors)}`);
+        }
+    }
 
     function createTown(name: string) {
         if (direction == 0) {
@@ -62,6 +114,7 @@
         const gridSize = 9;
         const spacing = 64;
 
+
         for (let i = 0; i < gridSize; i++) {
             for (let j = 0; j < gridSize; j++) {
             const isBorder = i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1;
@@ -82,15 +135,20 @@
             }
         }
 
-        towns.push({
+        const newTown = {
             name: `${name}'s Town`,
             x: currentX,
             y: currentY,
             squares: squares,
-        });
+            neighbors: checkNeighbors({name: `${name}'s Town`, x: currentX, y: currentY, squares: squares })
+        };
+
+        towns.push(newTown);
         towncount++;
         towns = [...towns];
         console.log(`Placing town: ${name}`, currentX, currentY);
+
+        updateAllNeighbors();
     }
 
     if (data.all_users) {
@@ -140,7 +198,7 @@
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
-            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} />
+            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} />
         {/each}
     </div>
 </div>
