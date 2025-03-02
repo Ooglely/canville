@@ -1,4 +1,4 @@
-import { pgTable, text, char, json, serial, integer, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, char, json, serial, integer, varchar, primaryKey } from "drizzle-orm/pg-core";
 import type { UserData } from "$lib/canvas/api";
 import { relations } from "drizzle-orm";
 
@@ -32,4 +32,18 @@ export const buildingTable = pgTable("building", {
   size: varchar({ length: 255 }).notNull(),
   x: integer("x").notNull(),
   y: integer("y").notNull(),
+});
+
+export const upgrade_levels = pgTable('upgradelevel', {
+    cityid: integer('cityid').notNull().references(() => cityTable.cityid, { onDelete: 'cascade' }),
+    chungus_level: integer('level').notNull(),
+    big_chungus_level: integer('level').notNull(),
+    bigbig_chungus_level: integer('level').notNull()
+});
+
+export const store = pgTable('store', {
+    itemname: varchar({ length: 255 }).notNull(),
+    sprite: varchar({ length: 255 }).notNull(),
+    description: varchar({ length: 255 }).notNull(),
+    cost: integer('cost').notNull()
 });

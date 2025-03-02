@@ -1,10 +1,12 @@
-import { eq } from "drizzle-orm";
-import { cityTable, buildingTable } from "./schema";
+import { and, eq } from "drizzle-orm";
+import { cityTable, buildingTable, upgrade_levels } from "./schema";
 import { db } from "./index";
 
 export async function addCity(ownerId: string, cityMoney: number) {
   const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney }).returning();
+  await db.insert(upgrade_levels).values({cityid: newCity[0].cityid, chungus_level:0, big_chungus_level:0, bigbig_chungus_level:0})
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
+
   return newCity[0];
 }
 
