@@ -132,7 +132,26 @@
     </div>
 </div>
 
+<button class="top-left-button" onclick={() => window.location.href = '/'}>
+    <img src="/xIcon.png" alt="Close" />
+</button>
+
+
+
 <style>
+    .top-left-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .top-left-button img {
+        width: 48px;
+        height: 48px;
+    }
     .edit {
         display: flex;
         flex-direction: row;

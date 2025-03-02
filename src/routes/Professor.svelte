@@ -172,7 +172,7 @@
     width: 64px;
     height: 64px;
     background-size: 192px 256px; /* Size of the entire spritesheet */
-    z-index: 100;
+    z-index: 20;
     transition: top 10s linear, left 10s linear;
     top: var(--y);
     left: var(--x);
