@@ -36,7 +36,7 @@ type UserAssignments = {
   to_do: AssignmentInfo[];
 };
 
-type UserData = {
+export type UserData = {
   id: number;
   name: string;
   courses: CompleteCourse[];
