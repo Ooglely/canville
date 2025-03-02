@@ -211,7 +211,7 @@
             x: number;
             y: number;
         }[] = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 1; i++) {
             professors.push({
                 name: `Professor ${i + 1}`,
                 spriteName: "forward",

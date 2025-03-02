@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   export let name: string;
   export let spriteName: string;
   export let x: number;
@@ -8,7 +9,7 @@
   let currentFrame = 0;
   const frames = ["forward", "walkingforward1", "walkingforward2", "backward", "walkingbackward1", "walkingbackward2", "left", "walkingleft1", "walkingleft2", "right", "walkingright1", "walkingright2"];
   const downFrames = ["walkingforward1", "walkingforward2"];
-  let interval;
+  let interval: number;
 
   // Function to get the background position based on sprite name
   function getBackgroundPosition(name: string){
@@ -51,6 +52,25 @@
       spriteName = frames[currentFrame];
     }
   }
+
+  
+  onMount(() => {
+        setTimeout(() => {
+            moveDown = true;
+        }, 1000); // Start the animation after 1 second
+    });
+
+
+  $: {
+    clearInterval(interval);
+    if (moveDown) {
+      interval = setInterval(nextFrame, 333); // Switch frames every 333ms (3 frames per second)
+    } else {
+      currentFrame = 0; // Reset to the first frame when not moving
+      spriteName = frames[currentFrame];
+    }
+  }
+
 
 </script>
 

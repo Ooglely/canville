@@ -27,12 +27,6 @@
 
     let moveDown = false;
 
-    onMount(() => {
-        setTimeout(() => {
-            moveDown = true;
-        }, 1000); // Start the animation after 1 second
-    });
-
     squares.forEach((square) => {
         if (square.border) {
             let cornerType = "";
@@ -96,7 +90,7 @@
                     imagePath = "/pathIntersection.png";
                 }
 
-                if (neighborCount < 2) {
+                if (neighborCount === 0) {
                     switch (`${square.gridCoords[0]},${square.gridCoords[1]}`) {
                         case "8,0":
                             square.rotateDeg = 270;
@@ -111,6 +105,33 @@
                             square.rotateDeg = 0;
                     }
                 }
+                if (neighborCount === 1) {
+                    if (cornerType === "top left") {
+                    if (neighbors.top || neighbors.topLeft) {
+                      square.rotateDeg = 0;
+                    } else if (neighbors.left) {
+                      square.rotateDeg = 90;
+                    }
+                    } else if (cornerType === "top right") {
+                    if (neighbors.top || neighbors.topRight) {
+                      square.rotateDeg = 180;
+                    } else if (neighbors.right) {
+                      square.rotateDeg = 90;
+                    }
+                    } else if (cornerType === "bottom left") {
+                    if (neighbors.bottom || neighbors.bottomLeft) {
+                      square.rotateDeg = 0;
+                    } else if (neighbors.left) {
+                      square.rotateDeg = 270;
+                    }
+                    } else if (cornerType === "bottom right") {
+                    if (neighbors.bottom || neighbors.bottomRight) {
+                      square.rotateDeg = 180;
+                    } else if (neighbors.right) {
+                      square.rotateDeg = 270;
+                    }
+                    }
+                }
                 square.backgroundImage = imagePath;
             } else if (square.gridCoords[0] === 0 || square.gridCoords[0] === 8) {
                 square.backgroundImage = "/pathHorizontal.png";
@@ -120,6 +141,8 @@
         } else {
             square.image = "";
         }
+
+        
     });
 </script>
 
