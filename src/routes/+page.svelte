@@ -8,7 +8,7 @@
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
 
-    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);
+    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] }[]>([]);
     let towncount = 0;
     let direction = 0; // 0=start, 1 = up, 2 = left, 3 = down, 4 = right
     let directioncount = 0;
@@ -58,17 +58,27 @@
             }
         }
 
-        const squares: { name: string; x: number; y: number }[] = [];
-        const gridSize = 7;
+        const squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[] = [];
+        const gridSize = 9;
         const spacing = 64;
 
         for (let i = 0; i < gridSize; i++) {
             for (let j = 0; j < gridSize; j++) {
-                squares.push({
-                    name: `Test ${i * gridSize + j + 1}`,
-                    x: currentX + j * spacing,
-                    y: currentY + i * spacing,
-                });
+            const isBorder = i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1;
+            squares.push({
+                name: isBorder ? `Border ${i * gridSize + j + 1}` : `Test ${i * gridSize + j + 1}`,
+                x: currentX + j * spacing,
+                y: currentY + i * spacing,
+                gridCoords: [i, j],
+                border: isBorder,
+                backgroundImage: "/grass.png",
+                rotateDeg: 0,
+                image: "",
+                width: 64,
+                height: 64,
+                top: 0,
+                left: 0,
+            });
             }
         }
 
@@ -275,5 +285,5 @@
         background-size: auto;
         background-repeat: repeat;
     }
-    
+
 </style>

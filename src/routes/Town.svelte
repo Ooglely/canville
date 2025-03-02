@@ -2,12 +2,46 @@
     export let name: string;
     export let x: number;
     export let y: number;
-    export let squares: { name: string; x: number; y: number }[]; //image: string; width: number; height: number; top: number; left: number
+    export let squares: { name: string; x: number; y: number; border: boolean, backgroundImage: string; rotateDeg: number; gridCoords: [number, number], image: string; width: number; height: number; top: number; left: number }[];
+
+    squares.forEach((square) => {
+        if(square.border) {
+            if (
+            (square.gridCoords[0] === 0 && square.gridCoords[1] === 0) || // top left
+            (square.gridCoords[0] === 8 && square.gridCoords[1] === 0) || // top right
+            (square.gridCoords[0] === 0 && square.gridCoords[1] === 8) || // bottom left
+            (square.gridCoords[0] === 8 && square.gridCoords[1] === 8)    // bottom right
+            ) {
+            square.backgroundImage = "/pathCorner.png";
+              switch (`${square.gridCoords[0]},${square.gridCoords[1]}`) {
+                case '8,0':
+                  square.rotateDeg = 270;
+                  break;
+                case '8,8':
+                  square.rotateDeg = 180;
+                  break;
+                case '0,8':
+                  square.rotateDeg = 90;
+                  break;
+                default:
+                  square.rotateDeg = 0;
+              }
+          } else if (square.gridCoords[0] === 0 || square.gridCoords[0] === 8) {
+            square.backgroundImage = "/pathHorizontal.png";
+          } else if (square.gridCoords[1] === 8 || square.gridCoords[1] === 0) {
+            square.backgroundImage = "/pathVertical.png";
+          }
+        } else {
+            square.image = "";
+        }
+    });
 </script>
 
 <div class="town" style="left: {x}px; top: {y}px;">
     {#each squares as square}
-        <div class="square" style="left: {square.x - x}px; top: {square.y - y}px;"></div>
+        <div class="square" style="left: {square.x - x}px; top: {square.y - y}px; background-image: url({square.backgroundImage}); transform: rotate({square.rotateDeg}deg);">
+            <div style="top: {square.top}px; left: {square.left}px; width: {square.width}px; height: {square.height}px; background-image: url({square.image});"></div>
+        </div>
     {/each}
     <div class="town-marker" style="">
         {name}
@@ -17,8 +51,8 @@
 <style>
     .town {
         position: absolute;
-        width: 448px;
-        height: 448px;
+        width: 576px;
+        height: 576px;
         background-image: url("/grass.png");
         background-size: cover;
         border: 2px black solid;
@@ -52,18 +86,11 @@
         width: 64px;
         height: 64px;
         border: 0px solid black;
-        background-image: url("/grass.png");
         background-size: cover;
     }
-
     .square::after {
         content: "";
         position: absolute;
-        top: -64px;
-        left: 0;
-        width: 100%;
-        height: 200%;
-        background-image: url("/flowerTree.png");
         background-size: cover;
         background-position: center;
     }
