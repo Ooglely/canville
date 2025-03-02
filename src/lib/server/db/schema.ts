@@ -23,29 +23,46 @@ export const cityTable = pgTable("city", {
   citymoney: integer("citymoney").notNull(),
 });
 
+export const cityRelations = relations(cityTable, ({ one, many }) => ({
+  buildings: many(buildingTable),
+  owner: one(userTable, {
+    fields: [cityTable.ownerId],
+    references: [userTable.id],
+  }),
+}));
+
 export const buildingTable = pgTable("building", {
   buildingid: serial("buildingid").primaryKey(),
   cityid: integer("cityid")
     .notNull()
     .references(() => cityTable.cityid, { onDelete: "cascade" }),
   sprite: varchar({ length: 255 }).notNull(),
-  width: integer('width').notNull(),
-  height: integer('height').notNull(),
+  width: integer("width").notNull(),
+  height: integer("height").notNull(),
   x: integer("x").notNull(),
   y: integer("y").notNull(),
 });
 
-export const upgrade_levels = pgTable('upgradelevel', {
-    cityid: integer('cityid').notNull().references(() => cityTable.cityid, { onDelete: 'cascade' }),
-    upgrade_name: varchar({ length: 255 }).notNull(),
-    level: integer('level').notNull()
+export const buildingRelations = relations(buildingTable, ({ one }) => ({
+  city: one(cityTable, {
+    fields: [buildingTable.cityid],
+    references: [cityTable.cityid],
+  }),
+}));
+
+export const upgrade_levels = pgTable("upgradelevel", {
+  cityid: integer("cityid")
+    .notNull()
+    .references(() => cityTable.cityid, { onDelete: "cascade" }),
+  upgrade_name: varchar({ length: 255 }).notNull(),
+  level: integer("level").notNull(),
 });
 
-export const store = pgTable('store', {
-    itemname: varchar({ length: 255 }).notNull(),
-    sprite: varchar({ length: 255 }).notNull(),
-    description: varchar({ length: 255 }).notNull(),
-    cost: integer('cost').notNull(),
-    width: integer('width').notNull(),
-    height: integer('height').notNull()
+export const store = pgTable("store", {
+  itemname: varchar({ length: 255 }).primaryKey().notNull(),
+  sprite: varchar({ length: 255 }).notNull(),
+  description: varchar({ length: 255 }).notNull(),
+  cost: integer("cost").notNull(),
+  width: integer("width").notNull(),
+  height: integer("height").notNull(),
 });

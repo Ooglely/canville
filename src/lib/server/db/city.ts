@@ -35,7 +35,12 @@ export async function addBuilding(cityId: number, sprite: string, width: number,
 }
 
 export async function getAllCities() {
-  const cities = await db.select().from(cityTable);
+  const cities = await db.query.cityTable.findMany({
+    with: {
+      buildings: true,
+      owner: true,
+    },
+  });
   console.log("Retrieved all cities:", cities);
   return cities;
 }

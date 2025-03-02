@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
+    import type { StoredBuilding } from "$lib/server/db/city";
     import { enhance } from "$app/forms";
     import Town from "./Town.svelte";
 
@@ -28,6 +29,16 @@
                 top: number;
                 left: number;
             }[];
+            neighbors: {
+                top: boolean;
+                left: boolean;
+                bottom: boolean;
+                right: boolean;
+                topLeft: boolean;
+                topRight: boolean;
+                bottomLeft: boolean;
+                bottomRight: boolean;
+            };
         }[]
     >([]);
     let towncount = 0;
@@ -107,7 +118,7 @@
         }
     }
 
-    function createTown(name: string) {
+    function createTown(name: string, buildings: StoredBuilding[]) {
         if (direction == 0) {
             currentX = 0;
             currentY = 0;
@@ -191,6 +202,7 @@
             y: currentY,
             squares: squares,
             neighbors: checkNeighbors({ name: `${name}'s Town`, x: currentX, y: currentY, squares: squares }),
+            buildings: buildings,
         };
 
         towns.push(newTown);
@@ -201,9 +213,9 @@
         updateAllNeighbors();
     }
 
-    if (data.all_users) {
-        for (const user of data.all_users) {
-            createTown(user.data.name.split(" ")[0]);
+    if (data.all_cities) {
+        for (const city of data.all_cities) {
+            createTown(city.owner.data.name.split(" ")[0], city.buildings);
         }
     }
 
@@ -248,7 +260,7 @@
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
-            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} />
+            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} buildings={town.buildings} />
         {/each}
     </div>
 </div>
@@ -349,7 +361,7 @@
         font-smooth: never;
         font-synthesis: none;
         font-family: "pgothic";
-        z-index: 100;
+        z-index: 2000;
     }
 
     span.title-text {
