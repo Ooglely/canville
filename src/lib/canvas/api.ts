@@ -200,7 +200,8 @@ export class CanvasApi {
     };
   }
 
-  async getGradedAssignments(data: UserData): Promise<number> {
+  async getGradedAssignments(): Promise<number> {
+    const data = await this.getUserData();
     let totalPoints = 0;
     for (const course of data.courses) {
       for (const assignment of course.assignments.due) {

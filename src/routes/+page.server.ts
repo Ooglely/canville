@@ -45,7 +45,8 @@ export const actions: Actions = {
       return fail(400, { failure: true, error: "Failed to authenticate with Canvas API, invalid token?" });
     }
     console.log("valid");
-    const new_user = await addUser(token);
+    const cash = await api.getGradedAssignments();
+    const new_user = await addUser(token, cash);
     cookies.set("session", new_user.id, { path: "/", secure: false, httpOnly: false });
     return {
       status: 200,
