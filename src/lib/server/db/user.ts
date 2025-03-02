@@ -4,6 +4,8 @@ import { createId } from "@paralleldrive/cuid2";
 import { CanvasApi } from "$lib/canvas/api";
 import { addCity } from "./city";
 
+export type StoredUser = typeof userTable.$inferSelect;
+
 export const getUserFromToken = async (token: string) => {
   const result = await db.query.userTable.findFirst({
     where: (user, { eq }) => eq(user.token, token),
@@ -32,6 +34,7 @@ export const addUser = async (token: string) => {
   //const [user] = await db.insert(userTable).values({ id, token, data: user_data }).returning();
   await db.insert(userTable).values({ id, token, data: user_data });
   // TODO: calculate money
+
   await addCity(id, 8000);
   return await db.query.userTable.findFirst({
     where: (user, { eq }) => eq(user.id, id),
