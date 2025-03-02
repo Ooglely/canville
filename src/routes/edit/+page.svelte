@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Placeholder } from "drizzle-orm";
+    import { onMount } from "svelte";
     import type { PageProps } from "./$types";
     import Item from "./Item.svelte";
 
@@ -21,6 +21,7 @@
         return points;
     });
     let gold = $state(data.user?.cities.citymoney);
+    let updating = $state(false);
     let grid: HTMLElement;
 
     function pointCheck(occupied: Set<[number, number]>, points: Set<[number, number]>) {
@@ -108,6 +109,31 @@
             gold -= selected_item.cost;
         }
     }
+
+    async function updateGold(city_id: number) {
+        console.log("calling");
+        updating = true;
+        const response = await fetch("/api/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                city_id: city_id,
+            }),
+        });
+        const data = await response.json();
+        console.log(data);
+        updating = false;
+        gold = data.cash;
+    }
+
+    onMount(() => {
+        console.log(data);
+        if (!data.user.token.startsWith("dummy_")) {
+            updateGold(data.user.cities.cityid);
+        }
+    });
 </script>
 
 <div class="edit">
@@ -123,6 +149,9 @@
         <div class="selection">
             selection: {selection} gold: {gold}
             <button onclick={submit}>Place</button>
+            {#if updating}
+                checking for new assignments...
+            {/if}
         </div>
     </div>
     <div class="store">
