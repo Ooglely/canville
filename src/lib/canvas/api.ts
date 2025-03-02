@@ -142,6 +142,9 @@ export class CanvasApi {
 
   async getUserData(): Promise<UserData> {
     const user = await this.getUserInfo();
+    if (!user) {
+      throw new Error("Failed to fetch user data");
+    }
     const courses = await this.getUserCourses();
     var course_list: CompleteCourse[] = [];
     for (const course of courses) {
@@ -195,5 +198,22 @@ export class CanvasApi {
       name: user.name,
       courses: course_list,
     };
+  }
+
+  async getGradedAssignments(): Promise<number> {
+    const data = await this.getUserData();
+    let totalPoints = 0;
+    for (const course of data.courses) {
+      for (const assignment of course.assignments.due) {
+        if (assignment.grade !== null && assignment.grade !== undefined) {
+          const percentage = assignment.grade / assignment.points_possible;
+          totalPoints += percentage * 200;
+        }
+        if (assignment.grade == null || assignment.grade == undefined) {
+          totalPoints += 100;
+        }
+      }
+    }
+    return Math.round(totalPoints);
   }
 }

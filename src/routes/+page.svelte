@@ -289,7 +289,7 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <h1>canville</h1>
+        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <hr />
@@ -326,12 +326,16 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <h1>canville</h1>
+        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
+    <br />
+    <h4>
+        <a href="https://github.com/Ooglely/canville">github repo</a>
+    </h4>
     <hr />
     {#if logged_in}
-        <p>hello {data.user?.data.name.split(" ")[0]}!</p>
+        <p>hello {data.user?.data.name.split(" ")[0]}! <a href="/edit">edit your town here!</a></p>
     {:else}
         <p>
             you seem to be lost...<br />
@@ -384,7 +388,11 @@
         font-smooth: never;
         font-synthesis: none;
         font-family: "pgothic";
-        z-index: 100;
+        z-index: 20000;
+    }
+
+    img.logo {
+        height: 50px;
     }
 
     span.title-text {
@@ -405,6 +413,10 @@
         margin: 0px;
         display: inline;
         padding: auto;
+    }
+
+    h4 {
+        margin: 3px;
     }
 
     hr {

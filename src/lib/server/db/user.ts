@@ -26,16 +26,14 @@ export const getUserFromSession = async (id: string) => {
   return result;
 };
 
-export const addUser = async (token: string) => {
+export const addUser = async (token: string, cash: number) => {
   // Should check if the user already exists before calling this!
   const id = createId();
   const api = new CanvasApi(token);
   const user_data = await api.getUserData();
-  //const [user] = await db.insert(userTable).values({ id, token, data: user_data }).returning();
-  await db.insert(userTable).values({ id, token, data: user_data });
-  // TODO: calculate money
 
-  await addCity(id, 8000);
+  await db.insert(userTable).values({ id, token, data: user_data });
+  await addCity(id, cash);
   return await db.query.userTable.findFirst({
     where: (user, { eq }) => eq(user.id, id),
     with: {
