@@ -6,7 +6,7 @@
 
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
-    import Town from './Town.svelte';
+    import Town from "./Town.svelte";
 
     let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);
     let towncount = 0;
@@ -135,12 +135,7 @@
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
-            <div class="town-marker" style="left: {town.x}px; top: {town.y}px; background-color: {i === towns.length - 1 ? 'red' : 'blue'};">
-                {i}
-            </div>
-            {#each town.squares as square}
-                <div class="square" style="left: {square.x}px; top: {square.y}px;"></div>
-            {/each}
+            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} />
         {/each}
     </div>
 </div>
