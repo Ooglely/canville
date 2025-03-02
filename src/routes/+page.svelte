@@ -3,7 +3,6 @@
     import type { StoredBuilding } from "$lib/server/db/city";
     import { enhance, applyAction } from "$app/forms";
     import Town from "./Town.svelte";
-    import Professor from "./Professor.svelte";
 
     let { data, form }: PageProps = $props();
 

@@ -26,6 +26,9 @@
     export let professors: { name: string; spriteName: string; x: number; y: number }[];
 
     let moveDown = false;
+    let moveRight = false;
+    let moveUp = false;
+    let moveLeft = false;
 
     squares.forEach((square) => {
         if (square.border) {
@@ -148,7 +151,7 @@
 
 <div class="town" style="left: {x}px; top: {y}px;">
     {#each professors as professor}
-    <Professor name={professor.name} x={professor.x} y={professor.y} spriteName={professor.spriteName} moveDown={moveDown} />
+    <Professor name={professor.name} x={professor.x} y={professor.y} spriteName={professor.spriteName} moveDown={moveDown} moveRight={moveRight} moveUp={moveUp} moveLeft={moveLeft}/>
     {/each}
     {#each buildings as building}
         <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" draggable="false" />
