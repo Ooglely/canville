@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Placeholder } from "drizzle-orm";
     import type { PageProps } from "./$types";
     import Item from "./Item.svelte";
 
@@ -7,11 +8,28 @@
     let selection = $state("none");
     let selectedX = $state(-1);
     let selectedY = $state(-1);
+    let selectedWidth = $state(-1);
+    let selectedHeight = $state(-1);
     let buildings = $state(data.buildings);
+    let occupied = $derived.by(() => {
+        let points: Set<[number, number]> = new Set();
+        for (let building of buildings) {
+            for (let point of calculatePoints(building.x, building.y, building.width, building.height, true)) {
+                points.add(point);
+            }
+        }
+        return points;
+    });
+    let gold = $state(data.user?.cities.citymoney);
     let grid: HTMLElement;
 
-    if (data) {
-        console.log(data.buildings);
+    function pointCheck(occupied: Set<[number, number]>, points: Set<[number, number]>) {
+        for (let point of points) {
+            for (let occupiedPoint of occupied) {
+                if (occupiedPoint[0] == point[0] && occupiedPoint[1] == point[1]) return false;
+            }
+        }
+        return true;
     }
 
     function handlePlacement(event: MouseEvent) {
@@ -19,17 +37,52 @@
             const chosenX = Math.floor(event.layerX / 64) * 64;
             const chosenY = Math.floor(event.layerY / 64) * 64;
             console.log(chosenX, chosenY);
-            selectedX = chosenX;
-            selectedY = chosenY;
+            if (selection != "none") {
+                let selected_item = data.store.find((item) => item.itemname === selection);
+                if (selected_item) {
+                    let placement_points = calculatePoints(chosenX, chosenY, selected_item.width, selected_item.height, false);
+                    console.log(placement_points, occupied);
+                    if (!pointCheck(occupied, placement_points)) return;
+                    for (let point of placement_points) {
+                        if (point[0] > 384 || point[1] > 384) return;
+                        if (point[0] < 0 || point[1] < 0) return;
+                    }
+                    selectedX = chosenX;
+                    selectedY = chosenY;
+                    selectedWidth = selected_item.width;
+                    selectedHeight = selected_item.height;
+                }
+            }
         }
+    }
+
+    function calculatePoints(x: number, y: number, width: number, height: number, inverted: boolean) {
+        let points: Set<[number, number]> = new Set();
+        if (inverted) {
+            for (let i = 0; i < width; i += 64) {
+                for (let j = 0; j < height; j += 64) {
+                    points.add([x + i, y - j]);
+                }
+            }
+        } else {
+            for (let i = 0; i < width; i += 64) {
+                for (let j = 0; j < height; j += 64) {
+                    points.add([x + i, y + j]);
+                }
+            }
+        }
+        return points;
     }
 
     async function submit() {
         if (selection == "none" || selectedX == -1 || selectedY == -1 || !data.user) {
             return;
         }
-        // TODO: check gold and db submission
         let selected_item = data.store.find((item) => item.itemname === selection);
+        if (selected_item && selected_item.cost > gold) {
+            alert("Not enough gold!");
+            return;
+        }
         console.log(selected_item);
 
         const response = await fetch("/api/edit", {
@@ -49,6 +102,9 @@
         if (buildings) {
             buildings.push(result);
         }
+        if (selected_item) {
+            gold -= selected_item.cost;
+        }
     }
 </script>
 
@@ -56,14 +112,14 @@
     <div class="grid">
         <button class="town" aria-label="Town" onclick={handlePlacement} bind:this={grid}>
             {#if selectedX > -1}
-                <div class="box" style="left: {selectedX - 2}px; top: {selectedY - 2}px; z-index: 1000"></div>
+                <div class="box" style="left: {selectedX - 2}px; top: {selectedY - 2}px; z-index: 1000; width: {selectedWidth}px; height: {selectedHeight}px;"></div>
             {/if}
             {#each buildings as building}
                 <img src={building.sprite} alt="building" width={building.width} style="left: {building.x}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" />
             {/each}
         </button>
         <div class="selection">
-            selection: {selection}
+            selection: {selection} gold: {gold}
             <button onclick={submit}>Place</button>
         </div>
     </div>

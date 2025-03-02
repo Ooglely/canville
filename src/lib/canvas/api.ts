@@ -142,6 +142,9 @@ export class CanvasApi {
 
   async getUserData(): Promise<UserData> {
     const user = await this.getUserInfo();
+    if (!user) {
+      throw new Error("Failed to fetch user data");
+    }
     const courses = await this.getUserCourses();
     var course_list: CompleteCourse[] = [];
     for (const course of courses) {
