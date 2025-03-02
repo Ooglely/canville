@@ -1,5 +1,7 @@
 <script lang="ts">
     import type { StoredBuilding } from "$lib/server/db/city";
+    import Professor from "./Professor.svelte";
+    import { onMount } from "svelte";
 
     export let name: string;
     export let x: number;
@@ -20,6 +22,16 @@
         left: number;
     }[];
     export let buildings: StoredBuilding[];
+
+    export let professors: { name: string; spriteName: string; x: number; y: number }[];
+
+    let moveDown = false;
+
+    onMount(() => {
+        setTimeout(() => {
+            moveDown = true;
+        }, 1000); // Start the animation after 1 second
+    });
 
     squares.forEach((square) => {
         if (square.border) {
@@ -84,10 +96,6 @@
                     imagePath = "/pathIntersection.png";
                 }
 
-                // if (cornerType === "bottom left"){
-                //   imagePath = "/coin.png";
-                // }
-
                 if (neighborCount < 2) {
                     switch (`${square.gridCoords[0]},${square.gridCoords[1]}`) {
                         case "8,0":
@@ -116,6 +124,9 @@
 </script>
 
 <div class="town" style="left: {x}px; top: {y}px;">
+    {#each professors as professor}
+    <Professor name={professor.name} x={professor.x} y={professor.y} spriteName={professor.spriteName} moveDown={moveDown} />
+    {/each}
     {#each buildings as building}
         <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" draggable="false" />
     {/each}
@@ -124,6 +135,7 @@
             <div style="top: {square.top}px; left: {square.left}px; width: {square.width}px; height: {square.height}px; background-image: url({square.image});"></div>
         </div>
     {/each}
+
     <div class="town-marker" style="">
         {name}
     </div>
@@ -180,4 +192,5 @@
         background-size: cover;
         background-position: center;
     }
+    
 </style>

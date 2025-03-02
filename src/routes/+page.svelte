@@ -1,13 +1,16 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
     import type { StoredBuilding } from "$lib/server/db/city";
-    import { enhance } from "$app/forms";
+    import { enhance, applyAction } from "$app/forms";
     import Town from "./Town.svelte";
+    import Professor from "./Professor.svelte";
 
     let { data, form }: PageProps = $props();
 
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
+    let window_width = $state(0);
+    let window_height = $state(0);
     console.log(data);
 
     let towns = $state<
@@ -39,6 +42,12 @@
                 bottomLeft: boolean;
                 bottomRight: boolean;
             };
+            professors: {
+                name: string;
+                spriteName: string;
+                x: number;
+                y: number;
+            }[];
         }[]
     >([]);
     let towncount = 0;
@@ -196,6 +205,21 @@
             }
         }
 
+        const professors: {
+            name: string;
+            spriteName: string;
+            x: number;
+            y: number;
+        }[] = [];
+        for (let i = 0; i < 3; i++) {
+            professors.push({
+                name: `Professor ${i + 1}`,
+                spriteName: "forward",
+                x: 0,
+                y: 0,
+            });
+        }
+
         const newTown = {
             name: `${name}'s Town`,
             x: currentX,
@@ -203,6 +227,7 @@
             squares: squares,
             neighbors: checkNeighbors({ name: `${name}'s Town`, x: currentX, y: currentY, squares: squares }),
             buildings: buildings,
+            professors: professors,
         };
 
         towns.push(newTown);
@@ -217,6 +242,14 @@
         for (const city of data.all_cities) {
             createTown(city.owner.data.name.split(" ")[0], city.buildings);
         }
+    }
+
+    function addManualTown(name: string) {
+        createTown(name, []);
+    }
+
+    function getAllOwnerIds() {
+        return data.all_cities.map((town) => town.ownerId);
     }
 
     setTimeout(() => {
@@ -255,55 +288,24 @@
             dragY = event.clientY - initY;
         }
     }
+
+    function handleWindowLoad(event: Event) {
+        moveX = window_width / 2 - 288;
+        moveY = window_height / 2 - 288;
+    }
 </script>
 
+<svelte:window onload={handleWindowLoad} bind:innerWidth={window_width} bind:innerHeight={window_height} />
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
-            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} buildings={town.buildings} />
+            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} buildings={town.buildings} professors={town.professors} />
         {/each}
     </div>
 </div>
 <div class="info">
     <span class="title-text">
-        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
-        <h2>pickhacks 2025</h2>
-    </span>
-    <hr />
-    {#if logged_in}
-        <p>Hello {data.user?.data.name.split(" ")[0]}!</p>
-    {:else}
-        <p>
-            you seem to be lost...<br />
-            to get your own city, enter your canvas access token below.<br />
-            you can go <a href="https://umsystem.instructure.com/profile/settings">here</a> to get your access token.
-            <br />
-        </p>
-        <form
-            method="POST"
-            action="?/login"
-            use:enhance={() => {
-                log_loading = true;
-
-                return async ({ result, update }) => {
-                    log_loading = false;
-                    update();
-                };
-            }}
-        >
-            <input name="token" type="text" placeholder="Canvas Access Token" />
-        </form>
-        {#if log_loading}
-            <p>loading...</p>
-        {/if}
-        {#if form?.failure}
-            <p>{form.error}</p>
-        {/if}
-    {/if}
-</div>
-<div class="info">
-    <span class="title-text">
-        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
+        <img class="logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <br />
@@ -326,8 +328,16 @@
             use:enhance={() => {
                 log_loading = true;
 
-                return async ({ update }) => {
+                return async ({ result, update }) => {
                     log_loading = false;
+                    if (result.type == "success") {
+                        await applyAction(result);
+                        if (form?.user) {
+                            if (!getAllOwnerIds().includes(form.user.id)) {
+                                addManualTown(form.user.data.name.split(" ")[0]);
+                            }
+                        }
+                    }
                     update();
                 };
             }}
@@ -337,12 +347,11 @@
         {#if log_loading}
             <p>loading...</p>
         {/if}
+        {#if form?.failure}
+            <p>{form.error}</p>
+        {/if}
     {/if}
 </div>
-
-<div class=""></div>
-
-<div class=""></div>
 
 <style>
     @font-face {

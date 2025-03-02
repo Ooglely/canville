@@ -50,7 +50,7 @@ export const actions: Actions = {
     cookies.set("session", new_user.id, { path: "/", secure: false, httpOnly: false });
     return {
       status: 200,
-      user,
+      new_user,
     };
   },
 };
