@@ -98,6 +98,8 @@
             }),
         });
         const result = await response.json();
+        selectedX = -1;
+        selectedY = -1;
         console.log(result);
         if (buildings) {
             buildings.push(result);
