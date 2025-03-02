@@ -1,12 +1,12 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
     import { enhance } from "$app/forms";
+    import Town from "./Town.svelte";
 
     let { data, form }: PageProps = $props();
 
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
-    import Town from "./Town.svelte";
 
     let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);
     let towncount = 0;
@@ -17,9 +17,7 @@
     let currentY = 0;
     let townSpacing = 64 * 8;
 
-    let townName = -1; // "NAME FROM CANVAS";
-
-    function createTown() {
+    function createTown(name: string) {
         if (direction == 0) {
             currentX = 0;
             currentY = 0;
@@ -74,20 +72,21 @@
             }
         }
 
-        townName++; // DELETE WHEN NAMES WORK
         towns.push({
-            name: `${townName}'s Town'`,
+            name: `${name}'s Town`,
             x: currentX,
             y: currentY,
             squares: squares,
         });
         towncount++;
         towns = [...towns];
-        console.log(`Placing town: ${townName}`, currentX, currentY);
+        console.log(`Placing town: ${name}`, currentX, currentY);
     }
 
-    for (let i = 0; i < 25; i++) {
-        createTown();
+    if (data.all_users) {
+        for (const user of data.all_users) {
+            createTown(user.data.name.split(" ")[0]);
+        }
     }
 
     setTimeout(() => {
@@ -126,10 +125,6 @@
             dragY = event.clientY - initY;
         }
     }
-
-    $effect(() => {
-        console.log(dragX, dragY, moveX, moveY);
-    });
 </script>
 
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>

@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { CanvasApi } from "$lib/canvas/api";
-import { addUser, getUserFromSession, getUserFromToken } from "$lib/server/db/user";
+import { addUser, getUserFromSession, getUserFromToken, getAllUsers } from "$lib/server/db/user";
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const session = cookies.get("session");
@@ -11,8 +11,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
 
   const user = await getUserFromSession(session);
+  const all_users = await getAllUsers();
   return {
     user,
+    all_users,
   };
 };
 
