@@ -7,32 +7,32 @@
     let logged_in = $derived(data?.user);
     let log_loading = $state(false);
 
-    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);    let towncount = 0;
+    let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);
+    let towncount = 0;
     let direction = 0; // 0=start, 1 = up, 2 = left, 3 = down, 4 = right
     let directioncount = 0;
     let directionlimit = 1;
     let currentX = 0;
     let currentY = 0;
-    let townSpacing = 64 *8;
+    let townSpacing = 64 * 8;
 
-    let townName = -1 // "NAME FROM CANVAS";
-
+    let townName = -1; // "NAME FROM CANVAS";
 
     function createTown() {
         if (direction == 0) {
             currentX = 0;
             currentY = 0;
             direction = 1;
-        }
-        else if (direction == 1) { // up
+        } else if (direction == 1) {
+            // up
             currentY -= townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
                 direction = 2;
                 directioncount = 0;
             }
-        }
-        else if (direction == 2) { // left
+        } else if (direction == 2) {
+            // left
             currentX -= townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
@@ -40,16 +40,16 @@
                 directioncount = 0;
                 directionlimit++;
             }
-        }
-        else if (direction == 3) { // down
+        } else if (direction == 3) {
+            // down
             currentY += townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
                 direction = 4;
                 directioncount = 0;
             }
-        }
-        else if (direction == 4) { // right
+        } else if (direction == 4) {
+            // right
             currentX += townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
@@ -87,7 +87,6 @@
 
     for (let i = 0; i < 25; i++) {
         createTown();
-        
     }
 
     setTimeout(() => {
@@ -132,15 +131,17 @@
     });
 </script>
 
-<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp} style="left: {dragX + moveX}px; top: {dragY + moveY}px;">
-    {#each towns as town, i}
-    <div class="town-marker" style="left: {town.x}px; top: {town.y}px; background-color: {i === towns.length-1 ? 'red' : 'blue'};">
-        {i}
+<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
+    <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
+        {#each towns as town, i}
+            <div class="town-marker" style="left: {town.x}px; top: {town.y}px; background-color: {i === towns.length - 1 ? 'red' : 'blue'};">
+                {i}
+            </div>
+            {#each town.squares as square}
+                <div class="square" style="left: {square.x}px; top: {square.y}px;"></div>
+            {/each}
+        {/each}
     </div>
-    {#each town.squares as square}
-        <div class="square" style="left: {square.x}px; top: {square.y}px;"></div>
-    {/each}
-{/each}
 </div>
 <div class="info">
     <span class="title-text">
@@ -195,6 +196,7 @@
         border-radius: 5px;
         background: wheat;
         padding: 10px;
+        margin: 10px;
         text-size-adjust: none;
         font-smooth: never;
         font-synthesis: none;
@@ -235,18 +237,18 @@
         width: 64px;
         height: 64px;
         border: 0px solid black;
-        background-image: url('/grass.png');
+        background-image: url("/grass.png");
         background-size: cover;
-        }
+    }
 
-        div.square::after {
-        content: '';
+    div.square::after {
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/house.png');
+        background-image: url("/house.png");
         background-size: contain;
         pointer-events: none;
     }
@@ -255,8 +257,13 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        overflow: visible;
+        overflow: hidden;
     }
+
+    div.container {
+        position: absolute;
+    }
+
     .town-marker {
         position: absolute;
         width: 20px;
