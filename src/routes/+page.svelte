@@ -361,7 +361,7 @@
         font-smooth: never;
         font-synthesis: none;
         font-family: "pgothic";
-        z-index: 100;
+        z-index: 2000;
     }
 
     span.title-text {
