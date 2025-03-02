@@ -1,10 +1,9 @@
-import { and, eq } from "drizzle-orm";
-import { cityTable, buildingTable, upgrade_levels } from "./schema";
+import { eq } from "drizzle-orm";
+import { cityTable, buildingTable, upgrade_levels, store } from "./schema";
 import { db } from "./index";
 
 export async function addCity(ownerId: string, cityMoney: number) {
   const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney }).returning();
-  await db.insert(upgrade_levels).values({cityid: newCity[0].cityid, chungus_level:0, big_chungus_level:0, bigbig_chungus_level:0})
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
 
   return newCity[0];
@@ -64,12 +63,22 @@ export async function setCityMoney(cityId: number, newMoney: number) {
 }
 
 //function to check if player has enough money NOT TESTED
-export async function checkPrice(cityId: number, cost: number): Promise<boolean> {
+export async function checkPrice(cityId: number, item: string): Promise<boolean> {
   const playermoney = await getCityMoney(cityId);
+  const cost = await getCost(item);
   if (playermoney < cost) {
     return false;
   }
   return true;
+}
+
+export async function getCost(item: string) {
+  const result = await db.select().from(store).where(eq(store.itemname, item));
+  if (result.length === 0) {
+    throw new Error(`Item ${item} does not exist in the store.`);
+  }
+  console.log(`Cost for item ${item}: ${result[0].cost}`);
+  return result[0].cost;
 }
 
 //upgrade function NOT TESTED
@@ -85,13 +94,8 @@ export async function upgrade(cityId: number, building: string) {
   const upgrade = upgrades[0];
   console.log(`Upgrading city with ID ${cityId} and building ${building}`);
 
-  
-  if (building === "chungus") {
-    upgrade.chungus_level += 1;
-    await db.update(upgrade_levels).set({ chungus_level: upgrade.chungus_level }).where(eq(upgrade_levels.cityid, cityId));
-  }
-  if (building === "big_chungus") {
-    upgrade.big_chungus_level += 1;
-    await db.update(upgrade_levels).set({ big_chungus_level: upgrade.big_chungus_level }).where(eq(upgrade_levels.cityid, cityId));
+  if (building === "havener") {
+    upgrade.havener_level += 1;
+    await db.update(upgrade_levels).set({ havener_level: upgrade.havener_level }).where(eq(upgrade_levels.cityid, cityId));
   }
 }
