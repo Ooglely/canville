@@ -40,7 +40,7 @@
         justify-content: center;
         color: black;
         font-size: 10px;
-        z-index: 1000;
+        z-index: 10;
         font-family: "pgothic";
         font-size: 14px;
         padding: 2px 5px;

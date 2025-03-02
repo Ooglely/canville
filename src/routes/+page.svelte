@@ -228,6 +228,7 @@
         font-smooth: never;
         font-synthesis: none;
         font-family: "pgothic";
+        z-index: 100;
     }
 
     span.title-text {
@@ -258,28 +259,6 @@
         margin: 0px;
     }
 
-    div.square {
-        color: blue;
-        position: absolute;
-        width: 64px;
-        height: 64px;
-        border: 0px solid black;
-        background-image: url("/grass.png");
-        background-size: cover;
-    }
-
-    div.square::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url("/house.png");
-        background-size: contain;
-        pointer-events: none;
-    }
-
     div.pane {
         position: absolute;
         width: 100%;
@@ -289,18 +268,5 @@
 
     div.container {
         position: absolute;
-    }
-
-    .town-marker {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 10px;
-        z-index: 1000;
     }
 </style>
