@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { StoredBuilding } from "$lib/server/db/city";
+
     export let name: string;
     export let x: number;
     export let y: number;
@@ -17,6 +19,7 @@
         top: number;
         left: number;
     }[];
+    export let buildings: StoredBuilding[];
 
     squares.forEach((square) => {
         if (square.border) {
@@ -113,6 +116,9 @@
 </script>
 
 <div class="town" style="left: {x}px; top: {y}px;">
+    {#each buildings as building}
+        <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" />
+    {/each}
     {#each squares as square}
         <div class="square" style="left: {square.x - x}px; top: {square.y - y}px; background-image: url({square.backgroundImage}); transform: rotate({square.rotateDeg}deg);">
             <div style="top: {square.top}px; left: {square.left}px; width: {square.width}px; height: {square.height}px; background-image: url({square.image});"></div>
@@ -133,13 +139,17 @@
         border: 0px black solid;
     }
 
+    .town img {
+        position: absolute;
+    }
+
     .town-marker {
         position: relative;
         border: 2px black solid;
         border-radius: 5px;
         background: wheat;
         left: 50%;
-        top: 100%;
+        top: calc(100% - 64px);
         width: fit-content;
         transform: translate(-50%, -50%);
         height: 20px;

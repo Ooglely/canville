@@ -2,22 +2,22 @@ import type { PageServerLoad, Actions } from "./$types";
 import { CanvasApi } from "$lib/canvas/api";
 import { fail } from "@sveltejs/kit";
 import { addUser, getUserFromSession, getUserFromToken, getAllUsers } from "$lib/server/db/user";
+import { getAllCities } from "$lib/server/db/city";
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const session = cookies.get("session");
-  const all_users = await getAllUsers();
+  const all_cities = await getAllCities();
   if (!session) {
     return {
       user: null,
-      all_users,
+      all_cities,
     };
   }
-
+  console.log(await getAllCities());
   const user = await getUserFromSession(session);
-  console.log(all_users);
   return {
     user,
-    all_users,
+    all_cities,
   };
 };
 
