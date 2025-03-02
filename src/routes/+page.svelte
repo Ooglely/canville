@@ -266,7 +266,7 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <h1>canville</h1>
+        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <hr />
@@ -303,7 +303,7 @@
 </div>
 <div class="info">
     <span class="title-text">
-        <h1>canville</h1>
+        <img class= "logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
     <hr />
@@ -362,6 +362,10 @@
         font-synthesis: none;
         font-family: "pgothic";
         z-index: 2000;
+    }
+
+    img.logo {
+        height: 50px;
     }
 
     span.title-text {
