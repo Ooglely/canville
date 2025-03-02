@@ -214,6 +214,6 @@ export class CanvasApi {
         }
       }
     }
-    return totalPoints;
+    return Math.round(totalPoints);
   }
 }
