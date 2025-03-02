@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { cityTable, buildingTable, upgrade_levels, store } from "./schema";
 import { db } from "./index";
 
@@ -62,7 +62,6 @@ export async function setCityMoney(cityId: number, newMoney: number) {
   return updated[0];
 }
 
-//function to check if player has enough money NOT TESTED
 export async function checkPrice(cityId: number, item: string): Promise<boolean> {
   const playermoney = await getCityMoney(cityId);
   const cost = await getCost(item);
@@ -81,21 +80,32 @@ export async function getCost(item: string) {
   return result[0].cost;
 }
 
-//upgrade function NOT TESTED
-export async function upgrade(cityId: number, building: string) {
+export async function getupgradelevel(cityId: number, upgradeName: string) {
+  const result = await db.select().from(upgrade_levels).where(and(eq(upgrade_levels.cityid, cityId), eq(upgrade_levels.upgrade_name, upgradeName)));
+  if (result.length === 0) {
+    throw new Error(`Upgrade ${upgradeName} does not exist in city ${cityId}`);
+  }
+  console.log(`Level of upgrade ${upgradeName} in city ${cityId}: ${result[0].level}`);
+  return result[0].level;
+}
+
+export async function upgrade(cityId: number, upgradeName: string) {
   const city = await db.select().from(cityTable).where(eq(cityTable.cityid, cityId));
   if (city.length === 0) {
     throw new Error(`City with ID ${cityId} does not exist.`);
   }
-  const upgrades = await db.select().from(upgrade_levels).where(eq(upgrade_levels.cityid, cityId));
-  if (upgrades.length === 0) {
-    throw new Error(`Upgrades for city with ID ${cityId} do not exist.`);
-  }
-  const upgrade = upgrades[0];
-  console.log(`Upgrading city with ID ${cityId} and building ${building}`);
 
-  if (building === "havener") {
-    upgrade.havener_level += 1;
-    await db.update(upgrade_levels).set({ havener_level: upgrade.havener_level }).where(eq(upgrade_levels.cityid, cityId));
+  const upgrades = await db.select().from(upgrade_levels).where(eq(upgrade_levels.cityid, cityId));
+  let upgrade = upgrades.find(upg => upg.upgrade_name === upgradeName);
+
+  if (!upgrade) {
+    const upgrade = await db.insert(upgrade_levels).values({ cityid: cityId, upgrade_name: upgradeName, level: 1 }).returning();
+    console.log(`Added new upgrade ${upgradeName} for city ${cityId} with level 1`);
+  } else {
+    upgrade.level += 1;
+    await db.update(upgrade_levels).set({ level: upgrade.level }).where(and(eq(upgrade_levels.cityid, cityId),eq(upgrade_levels.upgrade_name, upgradeName)));
+    console.log(`Upgraded ${upgradeName} in city ${cityId} to level ${upgrade.level}`);
   }
+
+  return upgrade;
 }
