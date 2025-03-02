@@ -17,23 +17,23 @@
     let currentY = 0;
     let townSpacing = 64 * 8;
 
-    let townName = -1 // "NAME FROM CANVAS";
+    let townName = -1; // "NAME FROM CANVAS";
 
     function createTown() {
         if (direction == 0) {
             currentX = 0;
             currentY = 0;
             direction = 1;
-        }
-        else if (direction == 1) { // up
+        } else if (direction == 1) {
+            // up
             currentY -= townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
                 direction = 2;
                 directioncount = 0;
             }
-        }
-        else if (direction == 2) { // left
+        } else if (direction == 2) {
+            // left
             currentX -= townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
@@ -41,16 +41,16 @@
                 directioncount = 0;
                 directionlimit++;
             }
-        }
-        else if (direction == 3) { // down
+        } else if (direction == 3) {
+            // down
             currentY += townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
                 direction = 4;
                 directioncount = 0;
             }
-        }
-        else if (direction == 4) { // right
+        } else if (direction == 4) {
+            // right
             currentX += townSpacing;
             directioncount++;
             if (directioncount == directionlimit) {
@@ -132,10 +132,51 @@
     });
 </script>
 
-<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp} style="left: {dragX + moveX}px; top: {dragY + moveY}px;">
-    {#each towns as town, i}
-        <Town name={town.name} x={town.x} y={town.y} squares={town.squares} />
-    {/each}
+<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
+    <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
+        {#each towns as town, i}
+            <div class="town-marker" style="left: {town.x}px; top: {town.y}px; background-color: {i === towns.length - 1 ? 'red' : 'blue'};">
+                {i}
+            </div>
+            {#each town.squares as square}
+                <div class="square" style="left: {square.x}px; top: {square.y}px;"></div>
+            {/each}
+        {/each}
+    </div>
+</div>
+<div class="info">
+    <span class="title-text">
+        <h1>canville</h1>
+        <h2>pickhacks 2025</h2>
+    </span>
+    <hr />
+    {#if logged_in}
+        <p>hello {data.user?.data.name.split(" ")[0]}!</p>
+    {:else}
+        <p>
+            you seem to be lost...<br />
+            to get your own city, enter your canvas access token below.<br />
+            you can go <a href="https://umsystem.instructure.com/profile/settings">here</a> to get your access token.
+            <br />
+        </p>
+        <form
+            method="POST"
+            action="?/login"
+            use:enhance={() => {
+                log_loading = true;
+
+                return async ({ update }) => {
+                    log_loading = false;
+                    update();
+                };
+            }}
+        >
+            <input name="token" type="text" placeholder="Canvas Access Token" />
+        </form>
+        {#if log_loading}
+            <p>loading...</p>
+        {/if}
+    {/if}
 </div>
 <div class="info">
     <span class="title-text">
@@ -174,6 +215,8 @@
 
 <div class=""></div>
 
+<div class=""></div>
+
 <style>
     @font-face {
         font-family: "pgothic";
@@ -190,6 +233,7 @@
         border-radius: 5px;
         background: wheat;
         padding: 10px;
+        margin: 10px;
         text-size-adjust: none;
         font-smooth: never;
         font-synthesis: none;
@@ -224,9 +268,49 @@
         margin: 0px;
     }
 
+    div.square {
+        color: blue;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        border: 0px solid black;
+        background-image: url("/grass.png");
+        background-size: cover;
+    }
+
+    div.square::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("/house.png");
+        background-size: contain;
+        pointer-events: none;
+    }
+
     div.pane {
         position: absolute;
         width: 100%;
         height: 100%;
+        overflow: hidden;
+    }
+
+    div.container {
+        position: absolute;
+    }
+
+    .town-marker {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        z-index: 1000;
     }
 </style>
