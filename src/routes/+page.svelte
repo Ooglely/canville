@@ -29,6 +29,16 @@
                 top: number;
                 left: number;
             }[];
+            neighbors: {
+                top: boolean;
+                left: boolean;
+                bottom: boolean;
+                right: boolean;
+                topLeft: boolean;
+                topRight: boolean;
+                bottomLeft: boolean;
+                bottomRight: boolean;
+            };
         }[]
     >([]);
     let towncount = 0;
