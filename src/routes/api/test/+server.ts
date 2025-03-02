@@ -1,18 +1,22 @@
-import { addBuilding, addCity, getAllCities, getBuildingsInCity, getCityMoney, setCityMoney } from "$lib/server/db/city.ts";
+import { addBuilding, addCity, getAllCities, getBuildingsInCity, getCityMoney, setCityMoney} from "$lib/server/db/city.ts";
 import type { RequestHandler } from "./$types";
+import type { UserData } from "$lib/canvas/api";
+import {getUserFromToken} from "$lib/server/db/user.ts";
+import {db} from "$lib/server/db/index.ts";
+import { store, upgrade_levels, cityTable } from "$lib/server/db/schema";
 
 export const GET: RequestHandler = async ({ url }) => {
   //city/building creation test
-  const city = await addCity(5000);
+  const citiess = await getAllCities();
+  const city = citiess[0];
+
+  const test = "chungus"
+  const newstoreitem = await db.insert(store).values({ itemname: "chungus", description: "chungus", sprite: "chungus", cost: 2000 }).returning();
 
   const buildingtest = await addBuilding(city.cityid, "chungushouse.png", "large", 0, 0);
   const buildingtest2 = await addBuilding(city.cityid, "chungus.png", "chungus", 2, 2);
   const buildingtest3 = await addBuilding(city.cityid, "bigchungus.png", "bigchungus", 4, 4);
   const buildingtest4 = await addBuilding(city.cityid, "bigchungus.png", "bigchungus", 4, 4);
-
-  //get cities/buildings test (all cities, all buildings for specified city)
-  const cities = await getAllCities();
-  const buildingsInCity = await getBuildingsInCity(city.cityid);
 
   //money tests
   const moneyBefore = await getCityMoney(city.cityid);
