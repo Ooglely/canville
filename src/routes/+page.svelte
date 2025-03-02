@@ -308,6 +308,10 @@
         <img class="logo" src="/canvilleLogo.png" alt="Canville" />
         <h2>pickhacks 2025</h2>
     </span>
+    <br />
+    <h4>
+        <a href="https://github.com/Ooglely/canville">github repo</a>
+    </h4>
     <hr />
     {#if logged_in}
         <p>Hello {data.user?.data.name.split(" ")[0]}!</p>
@@ -348,48 +352,6 @@
         {/if}
     {/if}
 </div>
-<div class="info">
-    <span class="title-text">
-        <img class="logo" src="/canvilleLogo.png" alt="Canville" />
-        <h2>pickhacks 2025</h2>
-    </span>
-    <br />
-    <h4>
-        <a href="https://github.com/Ooglely/canville">github repo</a>
-    </h4>
-    <hr />
-    {#if logged_in}
-        <p>hello {data.user?.data.name.split(" ")[0]}! <a href="/edit">edit your town here!</a></p>
-    {:else}
-        <p>
-            you seem to be lost...<br />
-            to get your own city, enter your canvas access token below.<br />
-            you can go <a href="https://umsystem.instructure.com/profile/settings">here</a> to get your access token.
-            <br />
-        </p>
-        <form
-            method="POST"
-            action="?/login"
-            use:enhance={() => {
-                log_loading = true;
-
-                return async ({ update }) => {
-                    log_loading = false;
-                    update();
-                };
-            }}
-        >
-            <input name="token" type="text" placeholder="Canvas Access Token" />
-        </form>
-        {#if log_loading}
-            <p>loading...</p>
-        {/if}
-    {/if}
-</div>
-
-<div class=""></div>
-
-<div class=""></div>
 
 <style>
     @font-face {
