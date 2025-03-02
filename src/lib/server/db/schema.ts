@@ -59,7 +59,7 @@ export const upgrade_levels = pgTable("upgradelevel", {
 });
 
 export const store = pgTable("store", {
-  itemname: varchar({ length: 255 }).notNull(),
+  itemname: varchar({ length: 255 }).primaryKey().notNull(),
   sprite: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 255 }).notNull(),
   cost: integer("cost").notNull(),

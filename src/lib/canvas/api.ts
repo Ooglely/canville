@@ -196,4 +196,20 @@ export class CanvasApi {
       courses: course_list,
     };
   }
+
+  async getGradedAssignments(data: UserData): Promise<number> {
+    let totalPoints = 0;
+    for (const course of data.courses) {
+      for (const assignment of course.assignments.due) {
+        if (assignment.grade !== null && assignment.grade !== undefined) {
+          const percentage = assignment.grade / assignment.points_possible;
+          totalPoints += percentage * 200;
+        }
+        if (assignment.grade == null || assignment.grade == undefined) {
+          totalPoints += 100;
+        }
+      }
+    }
+    return totalPoints;
+  }
 }
