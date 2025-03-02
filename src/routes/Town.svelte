@@ -5,9 +5,9 @@
     export let squares: { name: string; x: number; y: number }[]; //image: string; width: number; height: number; top: number; left: number
 </script>
 
-<div class="town">
+<div class="town" style="left: {x}px; top: {y}px;">
     {#each squares as square}
-        <div class="square" style="left: {square.x}px; top: {square.y}px;"></div>
+        <div class="square" style="left: {square.x - x}px; top: {square.y - y}px;"></div>
     {/each}
     <div class="town-marker" style="">
         {name}
@@ -16,7 +16,7 @@
 
 <style>
     .town {
-        position: relative;
+        position: absolute;
         width: 448px;
         height: 448px;
         background-image: url("/grass.png");
