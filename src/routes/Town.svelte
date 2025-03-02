@@ -117,7 +117,7 @@
 
 <div class="town" style="left: {x}px; top: {y}px;">
     {#each buildings as building}
-        <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" />
+        <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" draggable="false" />
     {/each}
     {#each squares as square}
         <div class="square" style="left: {square.x - x}px; top: {square.y - y}px; background-image: url({square.backgroundImage}); transform: rotate({square.rotateDeg}deg);">
@@ -152,14 +152,14 @@
         top: calc(100% - 64px);
         width: fit-content;
         transform: translate(-50%, -50%);
-        height: 84px;
+        height: 20px;
         border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: black;
         font-size: 10px;
-        z-index: 10;
+        z-index: 10000;
         font-family: "pgothic";
         font-size: 14px;
         padding: 2px 5px;
