@@ -1,14 +1,11 @@
 <script lang="ts">
+    import type { PageProps } from "./$types";
+    import { enhance } from "$app/forms";
 
-    // for (let i = 0; i < gridSize; i++) {
-    //     for (let j = 0; j < gridSize; j++) {
-    //         squares.push({
-    //             name: `Test ${i * gridSize + j + 1}`,
-    //             x: j * spacing,
-    //             y: i * spacing,
-    //         });
-    //     }
-    // }
+    let { data, form }: PageProps = $props();
+
+    let logged_in = $derived(data?.user);
+    let log_loading = $state(false);
 
     let towns = $state<{ name: string; x: number; y: number; squares: { name: string; x: number; y: number }[] }[]>([]);    let towncount = 0;
     let direction = 0; // 0=start, 1 = up, 2 = left, 3 = down, 4 = right
@@ -98,7 +95,6 @@
         console.log("Forced update, towns count:", towns.length);
     }, 10);
 
-
     let dragX = $state(0);
     let dragY = $state(0);
     let initX = $state(0);
@@ -136,7 +132,7 @@
     });
 </script>
 
-<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} style="left: {dragX + moveX}px; top: {dragY + moveY}px;">
+<div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp} style="left: {dragX + moveX}px; top: {dragY + moveY}px;">
     {#each towns as town, i}
     <div class="town-marker" style="left: {town.x}px; top: {town.y}px; background-color: {i === towns.length-1 ? 'red' : 'blue'};">
         {i}
@@ -146,8 +142,93 @@
     {/each}
 {/each}
 </div>
+<div class="info">
+    <span class="title-text">
+        <h1>canville</h1>
+        <h2>pickhacks 2025</h2>
+    </span>
+    <hr />
+    {#if logged_in}
+        <p>hello {data.user?.data.name.split(" ")[0]}!</p>
+    {:else}
+        <p>
+            you seem to be lost...<br />
+            to get your own city, enter your canvas access token below.<br />
+            you can go <a href="https://umsystem.instructure.com/profile/settings">here</a> to get your access token.
+            <br />
+        </p>
+        <form
+            method="POST"
+            action="?/login"
+            use:enhance={() => {
+                log_loading = true;
+
+                return async ({ update }) => {
+                    log_loading = false;
+                    update();
+                };
+            }}
+        >
+            <input name="token" type="text" placeholder="Canvas Access Token" />
+        </form>
+        {#if log_loading}
+            <p>loading...</p>
+        {/if}
+    {/if}
+</div>
+
+<div class=""></div>
 
 <style>
+    @font-face {
+        font-family: "pgothic";
+        src:
+            local("ms pgothic"),
+            url("/fonts/PGothic.ttf") format("truetype");
+        font-display: swap;
+        font-weight: lighter;
+    }
+
+    div.info {
+        position: absolute;
+        border: 2px black solid;
+        border-radius: 5px;
+        background: wheat;
+        padding: 10px;
+        text-size-adjust: none;
+        font-smooth: never;
+        font-synthesis: none;
+        font-family: "pgothic";
+    }
+
+    span.title-text {
+        vertical-align: middle;
+        height: 100%;
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 5px;
+    }
+
+    h1 {
+        margin: 0px;
+        font-size: 48px;
+        display: inline;
+    }
+
+    h2 {
+        margin: 0px;
+        display: inline;
+        padding: auto;
+    }
+
+    hr {
+        margin: 10px 0px;
+    }
+
+    p {
+        margin: 0px;
+    }
+
     div.square {
         color: blue;
         position: absolute;
