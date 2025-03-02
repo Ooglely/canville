@@ -3,6 +3,7 @@
     import type { StoredBuilding } from "$lib/server/db/city";
     import { enhance } from "$app/forms";
     import Town from "./Town.svelte";
+    import Professor from "./Professor.svelte";
 
     let { data, form }: PageProps = $props();
 
@@ -39,6 +40,12 @@
                 bottomLeft: boolean;
                 bottomRight: boolean;
             };
+            professors: {
+                name: string;
+                spriteName: string;
+                x: number;
+                y: number;
+            }[];
         }[]
     >([]);
     let towncount = 0;
@@ -196,6 +203,21 @@
             }
         }
 
+        const professors: {
+            name: string;
+            spriteName: string;
+            x: number;
+            y: number;
+        }[] = [];
+        for (let i = 0; i < 3; i++) {
+            professors.push({
+                name: `Professor ${i + 1}`,
+                spriteName: "forward",
+                x: 0,
+                y: 0,
+            });
+        }
+
         const newTown = {
             name: `${name}'s Town`,
             x: currentX,
@@ -203,6 +225,7 @@
             squares: squares,
             neighbors: checkNeighbors({ name: `${name}'s Town`, x: currentX, y: currentY, squares: squares }),
             buildings: buildings,
+            professors: professors
         };
 
         towns.push(newTown);
@@ -260,7 +283,7 @@
 <div class="pane" role="application" onmousedown={handleClickDown} onmouseup={handleClickUp} onmousemove={handleDrag} onmouseleave={handleClickUp}>
     <div class="container" style="left: {moveX + dragX}px; top: {moveY + dragY}px;">
         {#each towns as town, i}
-            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} buildings={town.buildings} />
+            <Town name={town.name} x={town.x} y={town.y} squares={town.squares} neighbors={town.neighbors} buildings={town.buildings} professors = {town.professors}/>
         {/each}
     </div>
 </div>
