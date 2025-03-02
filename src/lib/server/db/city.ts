@@ -6,7 +6,7 @@ export type StoredCity = typeof cityTable.$inferSelect;
 export type StoredBuilding = typeof buildingTable.$inferSelect;
 
 export async function addCity(ownerId: string, cityMoney: number) {
-  const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney }).returning();
+  const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney, citytotalmoney: cityMoney}).returning();
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
 
   return newCity[0];
@@ -122,4 +122,23 @@ export async function upgrade(cityId: number, upgradeName: string) {
   }
 
   return upgrade;
+}
+
+export async function setCityTotalMoney(cityId: number, newTotalMoney: number) {
+  const updated = await db.update(cityTable).set({ citytotalmoney: newTotalMoney }).where(eq(cityTable.cityid, cityId)).returning();
+  if (updated.length === 0) {
+    throw new Error(`City with ID ${cityId} does not exist.`);
+  }
+  console.log(`Updated total money for city ID ${cityId} to ${newTotalMoney}`);
+
+  return updated[0];
+}
+
+export async function getCityTotalMoney(cityId: number) {
+  const result = await db.select({ citytotalmoney: cityTable.citytotalmoney }).from(cityTable).where(eq(cityTable.cityid, cityId));
+  if (result.length === 0) {
+    throw new Error(`City with ID ${cityId} does not exist.`);
+  }
+  console.log(`Total money for city ID ${cityId}: ${result[0].citytotalmoney}`);
+  return result[0].citytotalmoney;
 }

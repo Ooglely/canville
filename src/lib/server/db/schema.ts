@@ -21,6 +21,7 @@ export const cityTable = pgTable("city", {
     .references(() => userTable.id, { onDelete: "cascade" }),
   cityid: serial("cityid").primaryKey(),
   citymoney: integer("citymoney").notNull(),
+  citytotalmoney: integer("citytotalmoney").default(0),
 });
 
 export const cityRelations = relations(cityTable, ({ one, many }) => ({
