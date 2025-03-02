@@ -37,9 +37,8 @@ export const buildingTable = pgTable("building", {
 
 export const upgrade_levels = pgTable('upgradelevel', {
     cityid: integer('cityid').notNull().references(() => cityTable.cityid, { onDelete: 'cascade' }),
-    chungus_level: integer('level').notNull(),
-    big_chungus_level: integer('level').notNull(),
-    bigbig_chungus_level: integer('level').notNull()
+    upgrade_name: varchar({ length: 255 }).notNull(),
+    level: integer('level').notNull()
 });
 
 export const store = pgTable('store', {

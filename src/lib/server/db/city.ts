@@ -1,10 +1,9 @@
-import { and, eq } from "drizzle-orm";
-import { cityTable, buildingTable, upgrade_levels } from "./schema";
+import { eq, and } from "drizzle-orm";
+import { cityTable, buildingTable, upgrade_levels, store } from "./schema";
 import { db } from "./index";
 
 export async function addCity(ownerId: string, cityMoney: number) {
   const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney }).returning();
-  await db.insert(upgrade_levels).values({cityid: newCity[0].cityid, chungus_level:0, big_chungus_level:0, bigbig_chungus_level:0})
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
 
   return newCity[0];
@@ -63,35 +62,50 @@ export async function setCityMoney(cityId: number, newMoney: number) {
   return updated[0];
 }
 
-//function to check if player has enough money NOT TESTED
-export async function checkPrice(cityId: number, cost: number): Promise<boolean> {
+export async function checkPrice(cityId: number, item: string): Promise<boolean> {
   const playermoney = await getCityMoney(cityId);
+  const cost = await getCost(item);
   if (playermoney < cost) {
     return false;
   }
   return true;
 }
 
-//upgrade function NOT TESTED
-export async function upgrade(cityId: number, building: string) {
+export async function getCost(item: string) {
+  const result = await db.select().from(store).where(eq(store.itemname, item));
+  if (result.length === 0) {
+    throw new Error(`Item ${item} does not exist in the store.`);
+  }
+  console.log(`Cost for item ${item}: ${result[0].cost}`);
+  return result[0].cost;
+}
+
+export async function getupgradelevel(cityId: number, upgradeName: string) {
+  const result = await db.select().from(upgrade_levels).where(and(eq(upgrade_levels.cityid, cityId), eq(upgrade_levels.upgrade_name, upgradeName)));
+  if (result.length === 0) {
+    throw new Error(`Upgrade ${upgradeName} does not exist in city ${cityId}`);
+  }
+  console.log(`Level of upgrade ${upgradeName} in city ${cityId}: ${result[0].level}`);
+  return result[0].level;
+}
+
+export async function upgrade(cityId: number, upgradeName: string) {
   const city = await db.select().from(cityTable).where(eq(cityTable.cityid, cityId));
   if (city.length === 0) {
     throw new Error(`City with ID ${cityId} does not exist.`);
   }
-  const upgrades = await db.select().from(upgrade_levels).where(eq(upgrade_levels.cityid, cityId));
-  if (upgrades.length === 0) {
-    throw new Error(`Upgrades for city with ID ${cityId} do not exist.`);
-  }
-  const upgrade = upgrades[0];
-  console.log(`Upgrading city with ID ${cityId} and building ${building}`);
 
-  
-  if (building === "chungus") {
-    upgrade.chungus_level += 1;
-    await db.update(upgrade_levels).set({ chungus_level: upgrade.chungus_level }).where(eq(upgrade_levels.cityid, cityId));
+  const upgrades = await db.select().from(upgrade_levels).where(eq(upgrade_levels.cityid, cityId));
+  let upgrade = upgrades.find(upg => upg.upgrade_name === upgradeName);
+
+  if (!upgrade) {
+    const upgrade = await db.insert(upgrade_levels).values({ cityid: cityId, upgrade_name: upgradeName, level: 1 }).returning();
+    console.log(`Added new upgrade ${upgradeName} for city ${cityId} with level 1`);
+  } else {
+    upgrade.level += 1;
+    await db.update(upgrade_levels).set({ level: upgrade.level }).where(and(eq(upgrade_levels.cityid, cityId),eq(upgrade_levels.upgrade_name, upgradeName)));
+    console.log(`Upgraded ${upgradeName} in city ${cityId} to level ${upgrade.level}`);
   }
-  if (building === "big_chungus") {
-    upgrade.big_chungus_level += 1;
-    await db.update(upgrade_levels).set({ big_chungus_level: upgrade.big_chungus_level }).where(eq(upgrade_levels.cityid, cityId));
-  }
+
+  return upgrade;
 }

@@ -2,6 +2,7 @@
     export let name: string;
     export let x: number;
     export let y: number;
+    export let neighbors: { top: boolean; left: boolean; bottom: boolean; right: boolean; topLeft: boolean; topRight: boolean; bottomLeft: boolean; bottomRight: boolean };
     export let squares: {
         name: string;
         x: number;
@@ -19,26 +20,87 @@
 
     squares.forEach((square) => {
         if (square.border) {
+            let cornerType = "";
+            let neighborCount = 0;
             if (
                 (square.gridCoords[0] === 0 && square.gridCoords[1] === 0) || // top left
                 (square.gridCoords[0] === 8 && square.gridCoords[1] === 0) || // top right
                 (square.gridCoords[0] === 0 && square.gridCoords[1] === 8) || // bottom left
                 (square.gridCoords[0] === 8 && square.gridCoords[1] === 8) // bottom right
             ) {
-                square.backgroundImage = "/pathCorner.png";
-                switch (`${square.gridCoords[0]},${square.gridCoords[1]}`) {
-                    case "8,0":
-                        square.rotateDeg = 270;
-                        break;
-                    case "8,8":
-                        square.rotateDeg = 180;
-                        break;
-                    case "0,8":
-                        square.rotateDeg = 90;
-                        break;
-                    default:
-                        square.rotateDeg = 0;
+                if (square.gridCoords[0] === 0 && square.gridCoords[1] === 0) {
+                    cornerType = "top left";
+                    if (neighbors.top) {
+                        neighborCount++;
+                    }
+                    if (neighbors.left) {
+                        neighborCount++;
+                    }
+                    if (neighbors.topLeft) {
+                        neighborCount++;
+                    }
+                } else if (square.gridCoords[0] === 8 && square.gridCoords[1] === 0) {
+                    cornerType = "bottom left";
+                    if (neighbors.bottom) {
+                        neighborCount++;
+                    }
+                    if (neighbors.left) {
+                        neighborCount++;
+                    }
+                    if (neighbors.bottomLeft) {
+                        neighborCount++;
+                    }
+                } else if (square.gridCoords[0] === 0 && square.gridCoords[1] === 8) {
+                    cornerType = "top right";
+                    if (neighbors.top) {
+                        neighborCount++;
+                    }
+                    if (neighbors.right) {
+                        neighborCount++;
+                    }
+                    if (neighbors.topRight) {
+                        neighborCount++;
+                    }
+                } else if (square.gridCoords[0] === 8 && square.gridCoords[1] === 8) {
+                    cornerType = "bottom right";
+                    if (neighbors.bottom) {
+                        neighborCount++;
+                    }
+                    if (neighbors.right) {
+                        neighborCount++;
+                    }
+                    if (neighbors.bottomRight) {
+                        neighborCount++;
+                    }
                 }
+                console.log(`Town: ${name}, Corner Type: ${cornerType}, Neighbors: ${JSON.stringify(neighbors)}, Neighbor Count: ${neighborCount}`);
+                let imagePath = "/pathCorner.png";
+                if (neighborCount === 1) {
+                    imagePath = "/pathThreeway.png";
+                } else if (neighborCount >= 2) {
+                    imagePath = "/pathIntersection.png";
+                }
+
+                // if (cornerType === "bottom left"){
+                //   imagePath = "/coin.png";
+                // }
+
+                if (neighborCount < 2) {
+                    switch (`${square.gridCoords[0]},${square.gridCoords[1]}`) {
+                        case "8,0":
+                            square.rotateDeg = 270;
+                            break;
+                        case "8,8":
+                            square.rotateDeg = 180;
+                            break;
+                        case "0,8":
+                            square.rotateDeg = 90;
+                            break;
+                        default:
+                            square.rotateDeg = 0;
+                    }
+                }
+                square.backgroundImage = imagePath;
             } else if (square.gridCoords[0] === 0 || square.gridCoords[0] === 8) {
                 square.backgroundImage = "/pathHorizontal.png";
             } else if (square.gridCoords[1] === 8 || square.gridCoords[1] === 0) {
@@ -68,7 +130,7 @@
         height: 576px;
         background-image: url("/grass.png");
         background-size: 64px 64px;
-        border: 2px black solid;
+        border: 0px black solid;
     }
 
     .town-marker {
