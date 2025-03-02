@@ -45,5 +45,7 @@ export const store = pgTable('store', {
     itemname: varchar({ length: 255 }).notNull(),
     sprite: varchar({ length: 255 }).notNull(),
     description: varchar({ length: 255 }).notNull(),
-    cost: integer('cost').notNull()
+    cost: integer('cost').notNull(),
+    width: integer('width').notNull(),
+    height: integer('height').notNull()
 });
