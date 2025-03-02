@@ -1,7 +1,7 @@
 import { db } from "./index";
 import { userTable } from "./schema";
 import { createId } from "@paralleldrive/cuid2";
-import { CanvasApi } from "$lib/canvas/api";
+import { CanvasApi, type UserData } from "$lib/canvas/api";
 import { addCity } from "./city";
 
 export type StoredUser = typeof userTable.$inferSelect;
@@ -29,8 +29,17 @@ export const getUserFromSession = async (id: string) => {
 export const addUser = async (token: string, cash: number) => {
   // Should check if the user already exists before calling this!
   const id = createId();
-  const api = new CanvasApi(token);
-  const user_data = await api.getUserData();
+  let user_data: UserData;
+  if (token.startsWith("dummy_")) {
+    user_data = {
+      id: 1234567,
+      name: token.split("_")[1],
+      courses: [],
+    };
+  } else {
+    const api = new CanvasApi(token);
+    user_data = await api.getUserData();
+  }
 
   await db.insert(userTable).values({ id, token, data: user_data });
   await addCity(id, cash);

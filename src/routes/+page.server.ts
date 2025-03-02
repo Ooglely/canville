@@ -39,6 +39,16 @@ export const actions: Actions = {
       };
     }
 
+    if (token.startsWith("dummy_")) {
+      // This is a dummy token for judges to use while testing
+      const new_user = await addUser(token, 3000);
+      cookies.set("session", new_user.id, { path: "/" });
+      return {
+        status: 200,
+        user: new_user,
+      };
+    }
+
     // Token doesn't exist, create a new user in the db
     var api = new CanvasApi(token);
     if (!(await api.isValid())) {
