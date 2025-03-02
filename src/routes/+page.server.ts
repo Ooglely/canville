@@ -2,7 +2,8 @@ import type { PageServerLoad, Actions } from "./$types";
 import { CanvasApi } from "$lib/canvas/api";
 import { fail } from "@sveltejs/kit";
 import { addUser, getUserFromSession, getUserFromToken, getAllUsers } from "$lib/server/db/user";
-import { getAllCities } from "$lib/server/db/city";
+import { getAllCities, setCityTotalMoney, getCityTotalMoney, getCityMoney, setCityMoney } from "$lib/server/db/city";
+import { char } from 'drizzle-orm/pg-core';
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const session = cookies.get("session");
@@ -15,6 +16,31 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
   console.log(await getAllCities());
   const user = await getUserFromSession(session);
+  const userCities = all_cities.filter(city => city.ownerId === user.id);
+  if (userCities.length === 0) {
+    return {
+      user,
+      all_cities,
+    };
+  }
+
+  const cityId = userCities?.[0]?.cityid;
+  if (!cityId || !user?.token) {
+    console.error("City ID or user token is missing");
+    return;
+  }
+  
+  //Adds money from new graded assignments on refresh
+  const api = new CanvasApi(user.token);
+  const gradecash = (await api.getGradedAssignments()) ?? 0;
+  const currentTotal = (await getCityTotalMoney(cityId)) ?? 0;
+  const currentCash = (await getCityMoney(cityId)) ?? 0;
+  
+  console.log(gradecash, currentTotal, currentCash);
+  const newCash = gradecash - currentTotal + currentCash;
+  await setCityMoney(cityId, newCash);
+  await setCityTotalMoney(cityId, gradecash);
+  
   return {
     user,
     all_cities,
