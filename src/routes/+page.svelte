@@ -269,4 +269,11 @@
     div.container {
         position: absolute;
     }
+
+    :global(body) {
+        background-image: url("/void.png");
+        background-size: auto;
+        background-repeat: repeat;
+    }
+    
 </style>
