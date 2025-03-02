@@ -314,7 +314,7 @@
     </h4>
     <hr />
     {#if logged_in}
-        <p>Hello {data.user?.data.name.split(" ")[0]}!</p>
+        <p>hello {data.user?.data.name.split(" ")[0]}! <a href="/edit">edit your town here!</a></p>
     {:else}
         <p>
             you seem to be lost...<br />
