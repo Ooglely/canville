@@ -4,14 +4,16 @@ import { addUser, getUserFromSession, getUserFromToken, getAllUsers } from "$lib
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const session = cookies.get("session");
+  const all_users = await getAllUsers();
   if (!session) {
     return {
       user: null,
+      all_users,
     };
   }
 
   const user = await getUserFromSession(session);
-  const all_users = await getAllUsers();
+  console.log(all_users);
   return {
     user,
     all_users,
