@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="details">
-        <p>Cost: {cost}</p>
+        <p>Cost: {cost} <img src="/coin.png" alt="Cost Icon" style="width: 16px; height: 16px; vertical-align: top;" /></p>
     </div>
     <button class="select" onclick={() => (selection = itemname)}> Select </button>
 </div>
