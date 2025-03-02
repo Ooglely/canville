@@ -29,7 +29,8 @@ export const buildingTable = pgTable("building", {
     .notNull()
     .references(() => cityTable.cityid, { onDelete: "cascade" }),
   sprite: varchar({ length: 255 }).notNull(),
-  size: varchar({ length: 255 }).notNull(),
+  width: integer('width').notNull(),
+  height: integer('height').notNull(),
   x: integer("x").notNull(),
   y: integer("y").notNull(),
 });
