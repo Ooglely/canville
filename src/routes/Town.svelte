@@ -152,7 +152,7 @@
         top: calc(100% - 64px);
         width: fit-content;
         transform: translate(-50%, -50%);
-        height: 20px;
+        height: 84px;
         border-radius: 2px;
         display: flex;
         align-items: center;
