@@ -6,7 +6,7 @@ export type StoredCity = typeof cityTable.$inferSelect;
 export type StoredBuilding = typeof buildingTable.$inferSelect;
 
 export async function addCity(ownerId: string, cityMoney: number) {
-  const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney, citytotalmoney: cityMoney}).returning();
+  const newCity = await db.insert(cityTable).values({ ownerId: ownerId, citymoney: cityMoney, citytotalmoney: cityMoney }).returning();
   console.log(`New city created with ID: ${newCity[0].cityid} and money: ${cityMoney}`);
 
   return newCity[0];
@@ -41,8 +41,19 @@ export async function getAllCities() {
       owner: true,
     },
   });
-  console.log("Retrieved all cities:", cities);
-  return cities;
+  const clean_cities = cities.map((city) => {
+    const { owner, ...rest } = city;
+    return {
+      ...rest,
+      owner: {
+        id: owner.id,
+        data: {
+          name: owner.data.name,
+        },
+      },
+    };
+  });
+  return clean_cities;
 }
 
 export async function getBuildingsInCity(cityId: number) {

@@ -85,7 +85,7 @@
                         neighborCount++;
                     }
                 }
-                console.log(`Town: ${name}, Corner Type: ${cornerType}, Neighbors: ${JSON.stringify(neighbors)}, Neighbor Count: ${neighborCount}`);
+
                 let imagePath = "/pathCorner.png";
                 if (neighborCount === 1) {
                     imagePath = "/pathThreeway.png";
@@ -110,29 +110,29 @@
                 }
                 if (neighborCount === 1) {
                     if (cornerType === "top left") {
-                    if (neighbors.top || neighbors.topLeft) {
-                      square.rotateDeg = 0;
-                    } else if (neighbors.left) {
-                      square.rotateDeg = 90;
-                    }
+                        if (neighbors.top || neighbors.topLeft) {
+                            square.rotateDeg = 0;
+                        } else if (neighbors.left) {
+                            square.rotateDeg = 90;
+                        }
                     } else if (cornerType === "top right") {
-                    if (neighbors.top || neighbors.topRight) {
-                      square.rotateDeg = 180;
-                    } else if (neighbors.right) {
-                      square.rotateDeg = 90;
-                    }
+                        if (neighbors.top || neighbors.topRight) {
+                            square.rotateDeg = 180;
+                        } else if (neighbors.right) {
+                            square.rotateDeg = 90;
+                        }
                     } else if (cornerType === "bottom left") {
-                    if (neighbors.bottom || neighbors.bottomLeft) {
-                      square.rotateDeg = 0;
-                    } else if (neighbors.left) {
-                      square.rotateDeg = 270;
-                    }
+                        if (neighbors.bottom || neighbors.bottomLeft) {
+                            square.rotateDeg = 0;
+                        } else if (neighbors.left) {
+                            square.rotateDeg = 270;
+                        }
                     } else if (cornerType === "bottom right") {
-                    if (neighbors.bottom || neighbors.bottomRight) {
-                      square.rotateDeg = 180;
-                    } else if (neighbors.right) {
-                      square.rotateDeg = 270;
-                    }
+                        if (neighbors.bottom || neighbors.bottomRight) {
+                            square.rotateDeg = 180;
+                        } else if (neighbors.right) {
+                            square.rotateDeg = 270;
+                        }
                     }
                 }
                 square.backgroundImage = imagePath;
@@ -144,14 +144,12 @@
         } else {
             square.image = "";
         }
-
-        
     });
 </script>
 
 <div class="town" style="left: {x}px; top: {y}px;">
     {#each professors as professor}
-    <Professor name={professor.name} x={professor.x} y={professor.y} spriteName={professor.spriteName} moveDown={moveDown} moveRight={moveRight} moveUp={moveUp} moveLeft={moveLeft}/>
+        <Professor name={professor.name} x={professor.x} y={professor.y} spriteName={professor.spriteName} {moveDown} {moveRight} {moveUp} {moveLeft} />
     {/each}
     {#each buildings as building}
         <img src={building.sprite} alt="building" width={building.width} style="left: {building.x + 64}px; bottom: {448 - building.y}px; z-index: {100 + building.y}" draggable="false" />
@@ -218,5 +216,4 @@
         background-size: cover;
         background-position: center;
     }
-    
 </style>

@@ -13,7 +13,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
       all_cities,
     };
   }
-  console.log(await getAllCities());
   const user = await getUserFromSession(session);
   return {
     user,

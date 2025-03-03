@@ -10,7 +10,6 @@
     let log_loading = $state(false);
     let window_width = $state(0);
     let window_height = $state(0);
-    console.log(data);
 
     let towns = $state<
         {
@@ -122,7 +121,6 @@
     function updateAllNeighbors() {
         for (const town of towns) {
             town.neighbors = checkNeighbors(town);
-            console.log(`Town: ${town.name}, Neighbors: ${JSON.stringify(town.neighbors)}`);
         }
     }
 
